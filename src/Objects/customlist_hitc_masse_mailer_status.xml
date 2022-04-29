@@ -1,0 +1,20 @@
+<customlist scriptid="customlist_hitc_masse_mailer_status">
+  <description>Possible statuses for HITC Mass Email Task records.</description>
+  <isinactive>F</isinactive>
+  <isordered>T</isordered>
+  <name>HITC Mass Email Status</name>
+  <customvalues>
+    <customvalue scriptid="val_53230_t1264278_138">
+      <isinactive>F</isinactive>
+      <value>Not Started</value>
+    </customvalue>
+    <customvalue scriptid="val_53231_t1264278_165">
+      <isinactive>F</isinactive>
+      <value>In Progress</value>
+    </customvalue>
+    <customvalue scriptid="val_53232_t1264278_590">
+      <isinactive>F</isinactive>
+      <value>Complete</value>
+    </customvalue>
+  </customvalues>
+</customlist>

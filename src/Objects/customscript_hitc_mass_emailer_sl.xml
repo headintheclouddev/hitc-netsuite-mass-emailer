@@ -1,0 +1,45 @@
+<suitelet scriptid="customscript_hitc_mass_emailer_sl">
+  <description>by Head in the Cloud Development, Inc.&#xd;
+gurus@headintheclouddev.com</description>
+  <isinactive>F</isinactive>
+  <name>HITC Mass Email Sender Suitelet</name>
+  <notifyadmins>F</notifyadmins>
+  <notifyowner>T</notifyowner>
+  <notifyuser>F</notifyuser>
+  <scriptfile>[/SuiteScripts/HITC Mass Emailer/hitc_mass_emailer_suitelet.js]</scriptfile>
+  <scriptcustomfields>
+    <scriptcustomfield scriptid="custscript_hitc_mass_emailer_send_async">
+      <accesslevel>2</accesslevel>
+      <applyformatting>F</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>T</defaultchecked>
+      <displaytype>NORMAL</displaytype>
+      <fieldtype>CHECKBOX</fieldtype>
+      <help>If this box is checked then the &quot;HITC Mass Emailer - Map Reduce&quot; script will be used to send emails.  If this box is not checked, then then emails will be sent immediately upon clicking &quot;Send&quot; in the suitelet.</help>
+      <isformula>F</isformula>
+      <ismandatory>F</ismandatory>
+      <label>Send Emails Asynchronously</label>
+      <searchlevel>2</searchlevel>
+      <storevalue>T</storevalue>
+    </scriptcustomfield>
+  </scriptcustomfields>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy1">
+      <allemployees>F</allemployees>
+      <allpartners>F</allpartners>
+      <allroles>T</allroles>
+      <isdeployed>T</isdeployed>
+      <isonline>F</isonline>
+      <loglevel>DEBUG</loglevel>
+      <runasrole>ADMINISTRATOR</runasrole>
+      <status>RELEASED</status>
+      <title>HITC Mass Emailer Suitelet</title>
+      <links>
+        <link>
+          <linkcategory>BASICLISTSCUSTOM</linkcategory>
+          <linklabel>HITC Mass Emailer Suitelet</linklabel>
+        </link>
+      </links>
+    </scriptdeployment>
+  </scriptdeployments>
+</suitelet>

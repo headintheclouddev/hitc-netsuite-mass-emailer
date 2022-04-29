@@ -1,0 +1,23 @@
+<suitelet scriptid="customscript_hitc_mass_emailer_unsub_sl">
+  <description>by Head in the Cloud Development, Inc.&#xd;
+gurus@headintheclouddev.com</description>
+  <isinactive>F</isinactive>
+  <name>HITC Mass Emailer Unsubscribe Suitelet</name>
+  <notifyadmins>F</notifyadmins>
+  <notifyowner>T</notifyowner>
+  <notifyuser>F</notifyuser>
+  <scriptfile>[/SuiteScripts/HITC Mass Emailer/hitc_mass_emailer_unsubscribe.js]</scriptfile>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy1">
+      <allemployees>F</allemployees>
+      <allpartners>F</allpartners>
+      <allroles>T</allroles>
+      <isdeployed>T</isdeployed>
+      <isonline>T</isonline>
+      <loglevel>DEBUG</loglevel>
+      <runasrole>ADMINISTRATOR</runasrole>
+      <status>RELEASED</status>
+      <title>HITC Mass Email Unsubscribe Suitelet</title>
+    </scriptdeployment>
+  </scriptdeployments>
+</suitelet>

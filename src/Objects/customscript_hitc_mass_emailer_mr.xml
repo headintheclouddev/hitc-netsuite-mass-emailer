@@ -1,0 +1,54 @@
+<mapreducescript scriptid="customscript_hitc_mass_emailer_mr">
+  <description>by Head in the Cloud Development, Inc.&#xd;
+gurus@headintheclouddev.com</description>
+  <isinactive>F</isinactive>
+  <name>HITC Mass Emailer - Map Reduce</name>
+  <notifyadmins>F</notifyadmins>
+  <notifyowner>T</notifyowner>
+  <scriptfile>[/SuiteScripts/HITC Mass Emailer/hitc_mass_emailer_mr.js]</scriptfile>
+  <scriptcustomfields>
+    <scriptcustomfield scriptid="custscript_hitc_mass_emailer_batch_size">
+      <accesslevel>2</accesslevel>
+      <applyformatting>T</applyformatting>
+      <checkspelling>F</checkspelling>
+      <defaultchecked>F</defaultchecked>
+      <defaultvalue>25000</defaultvalue>
+      <description>Controls when task records will be split</description>
+      <displaytype>NORMAL</displaytype>
+      <fieldtype>INTEGER</fieldtype>
+      <help>Controls at what interval large Mass Email Task records will be split.</help>
+      <isformula>F</isformula>
+      <ismandatory>T</ismandatory>
+      <label>Batch Size Limit</label>
+      <maxvalue>50000</maxvalue>
+      <searchlevel>2</searchlevel>
+      <storevalue>T</storevalue>
+    </scriptcustomfield>
+  </scriptcustomfields>
+  <scriptdeployments>
+    <scriptdeployment scriptid="customdeploy1">
+      <buffersize>1</buffersize>
+      <concurrencylimit></concurrencylimit>
+      <custscript_hitc_mass_emailer_batch_size>25000</custscript_hitc_mass_emailer_batch_size>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <queueallstagesatonce>T</queueallstagesatonce>
+      <runasrole>ADMINISTRATOR</runasrole>
+      <status>NOTSCHEDULED</status>
+      <title>HITC Mass Emailer - Deployment 1</title>
+      <yieldaftermins>60</yieldaftermins>
+    </scriptdeployment>
+    <scriptdeployment scriptid="customdeploy2">
+      <buffersize>1</buffersize>
+      <concurrencylimit></concurrencylimit>
+      <custscript_hitc_mass_emailer_batch_size>25000</custscript_hitc_mass_emailer_batch_size>
+      <isdeployed>T</isdeployed>
+      <loglevel>DEBUG</loglevel>
+      <queueallstagesatonce>T</queueallstagesatonce>
+      <runasrole>ADMINISTRATOR</runasrole>
+      <status>NOTSCHEDULED</status>
+      <title>HITC Mass Emailer - Deployment 2</title>
+      <yieldaftermins>60</yieldaftermins>
+    </scriptdeployment>
+  </scriptdeployments>
+</mapreducescript>
