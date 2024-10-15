@@ -9,13 +9,14 @@
 define(["require", "exports", "N/ui/dialog", "N/ui/message", "N/record", "N/search"], function (require, exports, dialog, message, record, search) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.saveRecord = exports.fieldChanged = exports.pageInit = void 0;
+    exports.pageInit = pageInit;
+    exports.fieldChanged = fieldChanged;
+    exports.saveRecord = saveRecord;
     function pageInit(context) {
         const transactionParameter = getParameter('transaction'); // This isn't currently in use. Can be hooked up to a button on transactions.
         if (transactionParameter)
             context.currentRecord.setValue('custpage_transaction', transactionParameter);
     }
-    exports.pageInit = pageInit;
     function fieldChanged(context) {
         console.log('Field Changed', context.sublistId, context.fieldId);
         const subject = context.currentRecord.getValue('custpage_subject');
@@ -32,9 +33,11 @@ define(["require", "exports", "N/ui/dialog", "N/ui/message", "N/record", "N/sear
                     const emailAddress = contactValues.email;
                     context.currentRecord.setCurrentSublistValue({ sublistId: 'custpage_contacts', fieldId: 'custpage_contact_company', value: companyName });
                     context.currentRecord.setCurrentSublistValue({ sublistId: 'custpage_contacts', fieldId: 'custpage_contact_email', value: emailAddress });
+                }).then((err) => {
+                    console.log('fieldChanged error', err);
                 });
         }
-        else if (~['custpage_employee_employee', 'custpage_partner_partner', 'custpage_customer_customer'].indexOf(context.fieldId)) { // Source in email
+        else if (['custpage_employee_employee', 'custpage_partner_partner', 'custpage_customer_customer'].includes(context.fieldId)) { // Source in email
             const entityId = context.currentRecord.getCurrentSublistValue({ sublistId: context.sublistId, fieldId: context.fieldId });
             if (entityId)
                 search.lookupFields.promise({ type: 'entity', id: entityId, columns: ['email', 'type'] }).then((entityValues) => {
@@ -66,7 +69,6 @@ define(["require", "exports", "N/ui/dialog", "N/ui/message", "N/record", "N/sear
             }
         }
     }
-    exports.fieldChanged = fieldChanged;
     function saveRecord(context) {
         // Require template OR subject and body
         const template = context.currentRecord.getValue('custpage_template');
@@ -89,7 +91,6 @@ define(["require", "exports", "N/ui/dialog", "N/ui/message", "N/record", "N/sear
         }
         return true;
     }
-    exports.saveRecord = saveRecord;
     function fillListFromSearch(searchType, searchId, rec) {
         // const columns = ['email', 'isinactive'];
         // if (searchType == 'contact') columns.push('company'); // TODO: Do we need this?

@@ -33,8 +33,10 @@ export function fieldChanged(context: EntryPoints.Client.fieldChangedContext) {
       const emailAddress = contactValues.email as string;
       context.currentRecord.setCurrentSublistValue({ sublistId: 'custpage_contacts', fieldId: 'custpage_contact_company', value: companyName  });
       context.currentRecord.setCurrentSublistValue({ sublistId: 'custpage_contacts', fieldId: 'custpage_contact_email',   value: emailAddress });
+    }).then((err) => {
+      console.log('fieldChanged error', err);
     });
-  } else if (~['custpage_employee_employee', 'custpage_partner_partner', 'custpage_customer_customer'].indexOf(context.fieldId)) { // Source in email
+  } else if (['custpage_employee_employee', 'custpage_partner_partner', 'custpage_customer_customer'].includes(context.fieldId)) { // Source in email
     const entityId = context.currentRecord.getCurrentSublistValue({ sublistId: context.sublistId, fieldId: context.fieldId }) as string;
     if (entityId) search.lookupFields.promise({ type: 'entity', id: entityId, columns: ['email', 'type'] }).then((entityValues) => {
       console.log('Entity values', entityValues);
