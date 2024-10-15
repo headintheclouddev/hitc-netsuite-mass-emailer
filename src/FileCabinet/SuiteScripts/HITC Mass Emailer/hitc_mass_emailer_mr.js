@@ -10,7 +10,8 @@
 define(["require", "exports", "N/email", "N/log", "N/record", "N/render", "N/runtime", "N/search", "N/task", "N/url"], function (require, exports, email, log, record, render, runtime, search, task, url) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.summarize = exports.reduce = exports.map = exports.getInputData = void 0;
+    exports.summarize = exports.reduce = exports.map = void 0;
+    exports.getInputData = getInputData;
     /** Find HITC Mass Email Task records to process. */
     function getInputData() {
         // Find records where the status is "Not Started"
@@ -59,46 +60,50 @@ define(["require", "exports", "N/email", "N/log", "N/record", "N/render", "N/run
         });
         return recordsToProcess;
     }
-    exports.getInputData = getInputData;
     /** Merge the template and send the email. */
     const map = (context) => {
-        const contextValues = JSON.parse(context.value);
         log.debug(`map ${context.key}`, context.value);
-        if (isUnsubscribed(contextValues.recipient, contextValues.campaignId))
-            return context.write(contextValues.taskRecId, 'Processed');
-        if (hasRecentBounce(contextValues.recipient, contextValues.campaignId))
-            return context.write(contextValues.taskRecId, 'Skipped Bounce');
-        // Load the record and get the body text
-        const rec = record.load({ type: 'customrecord_hitc_mass_email_task', id: Number(contextValues.taskRecId) });
-        const data = JSON.parse(rec.getValue('custrecord_hitc_mass_email_task_data'));
-        let body = data.body;
-        let subject = data.subject;
-        const relatedRecords = {};
-        const attachments = [];
-        if (data.transaction) {
-            attachments.push(render.transaction({ entityId: Number(data.transaction), printMode: data.printMode }));
-            relatedRecords['transactionId'] = data.transaction;
-        }
-        if (data.template) {
+        try {
+            const contextValues = JSON.parse(context.value);
+            if (isUnsubscribed(contextValues.recipient, contextValues.campaignId))
+                return context.write(contextValues.taskRecId, 'Processed');
+            if (hasRecentBounce(contextValues.recipient, contextValues.campaignId))
+                return context.write(contextValues.taskRecId, 'Skipped Bounce');
+            // Load the record and get the body text
+            const rec = record.load({ type: 'customrecord_hitc_mass_email_task', id: Number(contextValues.taskRecId) });
+            const data = JSON.parse(rec.getValue('custrecord_hitc_mass_email_task_data'));
+            let body = data.body;
+            let subject = data.subject;
+            const relatedRecords = {};
+            const attachments = [];
+            if (data.transaction) {
+                attachments.push(render.transaction({ entityId: Number(data.transaction), printMode: data.printMode }));
+                relatedRecords['transactionId'] = data.transaction;
+            }
+            if (data.template) {
+                try {
+                    const merge = render.mergeEmail({ templateId: Number(data.template), entity: { type: contextValues.recipient.type, id: Number(contextValues.recipient.id) } });
+                    body = merge.body;
+                    subject = merge.subject;
+                }
+                catch (e) {
+                    return log.error(`Failed to load template ${data.template}`, e.message);
+                }
+            }
+            if (contextValues.campaignId)
+                body = body.replace('{{UNSUBSCRIBE}}', getUnsubscribeURL(contextValues));
             try {
-                const merge = render.mergeEmail({ templateId: Number(data.template), entity: { type: contextValues.recipient.type, id: Number(contextValues.recipient.id) } });
-                body = merge.body;
-                subject = merge.subject;
+                email.send({ author: Number(data.author), recipients: [Number(contextValues.recipient.id)], subject, body, cc: data.cc, bcc: data.bcc, relatedRecords, attachments });
+                log.debug(`map ${context.key}`, `Email Sent to Recipient: ${contextValues.recipient.type} ${contextValues.recipient.id} at ${new Date()}`);
+                context.write(contextValues.taskRecId, 'Processed');
             }
             catch (e) {
-                return log.error(`Failed to load template ${data.template}`, e.message);
+                log.error(`map ${context.key}`, `Email Failed; Recipient: ${contextValues.recipient.type} ${contextValues.recipient.id}; ${e.message}`);
+                context.write(contextValues.taskRecId, 'Error');
             }
         }
-        if (contextValues.campaignId)
-            body = body.replace('{{UNSUBSCRIBE}}', getUnsubscribeURL(contextValues));
-        try {
-            email.send({ author: Number(data.author), recipients: [Number(contextValues.recipient.id)], subject, body, cc: data.cc, bcc: data.bcc, relatedRecords, attachments });
-            log.debug(`map ${context.key}`, `Email Sent to Recipient: ${contextValues.recipient.type} ${contextValues.recipient.id} at ${new Date()}`);
-            context.write(contextValues.taskRecId, 'Processed');
-        }
         catch (e) {
-            log.error(`map ${context.key}`, `Email Failed; Recipient: ${contextValues.recipient.type} ${contextValues.recipient.id}; ${e.message}`);
-            context.write(contextValues.taskRecId, 'Error');
+            log.error(`map ${context.key}`, e.message);
         }
     };
     exports.map = map;

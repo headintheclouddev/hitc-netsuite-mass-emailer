@@ -66,39 +66,43 @@ export function getInputData(): Object {
 
 /** Merge the template and send the email. */
 export const map: EntryPoints.MapReduce.map = (context) => {
-  const contextValues: TaskEntity = JSON.parse(context.value);
   log.debug(`map ${context.key}`, context.value);
-  if (isUnsubscribed(contextValues.recipient, contextValues.campaignId))
-    return context.write(contextValues.taskRecId, 'Processed');
-  if (hasRecentBounce(contextValues.recipient, contextValues.campaignId)) return context.write(contextValues.taskRecId, 'Skipped Bounce');
-  // Load the record and get the body text
-  const rec = record.load({ type: 'customrecord_hitc_mass_email_task', id: Number(contextValues.taskRecId) });
-  const data: MASS_EMAIL_TASK = JSON.parse(rec.getValue('custrecord_hitc_mass_email_task_data') as string);
-  let   body    = data.body;
-  let   subject = data.subject;
-  const relatedRecords = {};
-  const attachments: file.File[] = [];
-  if (data.transaction) {
-    attachments.push(render.transaction({ entityId: Number(data.transaction), printMode: data.printMode }));
-    relatedRecords['transactionId'] = data.transaction; 
-  }
-  if (data.template) {
-    try {
-      const merge = render.mergeEmail({ templateId: Number(data.template), entity: { type: contextValues.recipient.type, id: Number(contextValues.recipient.id) } });
-      body    = merge.body;
-      subject = merge.subject;
-    } catch(e) {
-      return log.error(`Failed to load template ${data.template}`, e.message);
-    }
-  }
-  if (contextValues.campaignId) body = body.replace('{{UNSUBSCRIBE}}', getUnsubscribeURL(contextValues));
   try {
-    email.send({ author: Number(data.author), recipients: [Number(contextValues.recipient.id)], subject, body, cc: data.cc, bcc: data.bcc, relatedRecords, attachments });
-    log.debug(`map ${context.key}`, `Email Sent to Recipient: ${contextValues.recipient.type} ${contextValues.recipient.id} at ${new Date()}`);
-    context.write(contextValues.taskRecId, 'Processed');
+    const contextValues: TaskEntity = JSON.parse(context.value);
+    if (isUnsubscribed(contextValues.recipient, contextValues.campaignId))
+      return context.write(contextValues.taskRecId, 'Processed');
+    if (hasRecentBounce(contextValues.recipient, contextValues.campaignId)) return context.write(contextValues.taskRecId, 'Skipped Bounce');
+    // Load the record and get the body text
+    const rec = record.load({ type: 'customrecord_hitc_mass_email_task', id: Number(contextValues.taskRecId) });
+    const data: MASS_EMAIL_TASK = JSON.parse(rec.getValue('custrecord_hitc_mass_email_task_data') as string);
+    let   body    = data.body;
+    let   subject = data.subject;
+    const relatedRecords = {};
+    const attachments: file.File[] = [];
+    if (data.transaction) {
+      attachments.push(render.transaction({ entityId: Number(data.transaction), printMode: data.printMode }));
+      relatedRecords['transactionId'] = data.transaction;
+    }
+    if (data.template) {
+      try {
+        const merge = render.mergeEmail({ templateId: Number(data.template), entity: { type: contextValues.recipient.type, id: Number(contextValues.recipient.id) } });
+        body    = merge.body;
+        subject = merge.subject;
+      } catch(e) {
+        return log.error(`Failed to load template ${data.template}`, e.message);
+      }
+    }
+    if (contextValues.campaignId) body = body.replace('{{UNSUBSCRIBE}}', getUnsubscribeURL(contextValues));
+    try {
+      email.send({ author: Number(data.author), recipients: [Number(contextValues.recipient.id)], subject, body, cc: data.cc, bcc: data.bcc, relatedRecords, attachments });
+      log.debug(`map ${context.key}`, `Email Sent to Recipient: ${contextValues.recipient.type} ${contextValues.recipient.id} at ${new Date()}`);
+      context.write(contextValues.taskRecId, 'Processed');
+    } catch(e) {
+      log.error(`map ${context.key}`, `Email Failed; Recipient: ${contextValues.recipient.type} ${contextValues.recipient.id}; ${e.message}`);
+      context.write(contextValues.taskRecId, 'Error');
+    }
   } catch(e) {
-    log.error(`map ${context.key}`, `Email Failed; Recipient: ${contextValues.recipient.type} ${contextValues.recipient.id}; ${e.message}`);
-    context.write(contextValues.taskRecId, 'Error');
+    log.error(`map ${context.key}`, e.message);
   }
 };
 

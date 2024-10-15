@@ -10,7 +10,7 @@
 define(["require", "exports", "N/email", "N/error", "N/https", "N/log", "N/ui/message", "N/record", "N/render", "N/runtime", "N/search", "N/ui/serverWidget", "N/task"], function (require, exports, email, error, https, log, message, record, render, runtime, search, serverWidget, task) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.onRequest = void 0;
+    exports.onRequest = onRequest;
     function onRequest(context) {
         if (context.request.method == 'GET') {
             try {
@@ -64,7 +64,6 @@ define(["require", "exports", "N/email", "N/error", "N/https", "N/log", "N/ui/me
             context.response.writePage({ pageObject: drawForm(emailsSent) });
         }
     }
-    exports.onRequest = onRequest;
     function drawForm(emailsSent) {
         const form = serverWidget.createForm({ title: 'Mass Emailer' });
         if (emailsSent)

@@ -10,7 +10,7 @@
 define(["require", "exports", "N/log", "N/record"], function (require, exports, log, record) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.onRequest = void 0;
+    exports.onRequest = onRequest;
     function onRequest(context) {
         const recordType = context.request.parameters['etype'];
         const recordIdIn = Number(context.request.parameters['eid']);
@@ -60,7 +60,6 @@ define(["require", "exports", "N/log", "N/record"], function (require, exports, 
             }
         }
     }
-    exports.onRequest = onRequest;
     function displayEmailSubscriptionPreferences(recordType, recordId, emailAddr) {
         let subscriptionsHTML = '';
         try {
