@@ -30,11 +30,11 @@ export function fieldChanged(context: EntryPoints.Client.fieldChangedContext) {
       console.log('Contact values', contactValues);
       const companies    = contactValues['company'] as { value: string, text: string }[];
       const companyName  = (companies && companies.length > 0) ? companies[0].text : '';
-      const emailAddress = contactValues.email as string;
+      const emailAddress = contactValues.email as string || ''; // It'll be undefined if the user did not have access to that contact
       context.currentRecord.setCurrentSublistValue({ sublistId: 'custpage_contacts', fieldId: 'custpage_contact_company', value: companyName  });
       context.currentRecord.setCurrentSublistValue({ sublistId: 'custpage_contacts', fieldId: 'custpage_contact_email',   value: emailAddress });
-    }).then((err) => {
-      console.log('fieldChanged error', err);
+    }).catch((err) => {
+      console.log('fieldChanged - contact lookup error', err);
     });
   } else if (['custpage_employee_employee', 'custpage_partner_partner', 'custpage_customer_customer'].includes(context.fieldId)) { // Source in email
     const entityId = context.currentRecord.getCurrentSublistValue({ sublistId: context.sublistId, fieldId: context.fieldId }) as string;
